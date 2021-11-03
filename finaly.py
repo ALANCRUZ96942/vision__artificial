@@ -1,21 +1,22 @@
 import cv2
 import numpy as np
-import serial
+#import serial
 import camara
-import time
+#import time
+import RPi.GPIO as gpio
 
 cap = cv2.VideoCapture(camara.gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 #serialcomm = serial.Serial('COM7', 9600)
 #serialcomm.timeout = 1
 # blue
-lower_colorB = [96, 109, 151]
+lower_colorB = [96, 33, 151]
 upperColorB = [105, 255, 255]
 # red
-lower_colorR = [158, 100, 197]
-upperColorR = [179, 255, 255]
-# green
-lower_colorY = [22, 71, 161]
-upperColorY = [30, 255, 255]
+lower_colorR = [90, 90, 160]
+upperColorR = [179, 120, 255]
+# amarillo
+lower_colorY = [20, 71, 161]
+upperColorY = [90, 255, 255]
 
 lowerLimitsB = np.array(lower_colorB)
 upperLimitsB = np.array(upperColorB)
@@ -38,6 +39,12 @@ detG = cv2.SimpleBlobDetector_create(params)
 detB = cv2.SimpleBlobDetector_create(params)
 detR = cv2.SimpleBlobDetector_create(params)
 
+gpio.setwarnings(False)
+gpio.setmode(gpio.BOARD)
+gpio.setup(7,gpio.OUT)
+gpio.setup(11,gpio.OUT)
+gpio.setup(13,gpio.OUT)
+gpio.setup(15,gpio.OUT)
 while True:
     success, img = cap.read()
     y = "YELLOW"
@@ -45,6 +52,8 @@ while True:
     r = "RED"
     img = cv2.GaussianBlur(img, (35, 35), 3)
     imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+
     imageMaskY = cv2.inRange(imgHSV, lowerLimitsY, upperLimitsY)
     imageMaskR = cv2.inRange(imgHSV, lowerLimitsR, upperLimitsR)
     imageMaskB = cv2.inRange(imgHSV, lowerLimitsB, upperLimitsB)
@@ -60,15 +69,34 @@ while True:
     for kb in keyPointsB:
         #serialcomm.write(b.encode())
         print(b.encode())
+        gpio.output(7,True)
+        gpio.output(11,False)
+        gpio.output(13,False)
+        gpio.output(15,False)
+
     for kr in keyPointsR:
         #serialcomm.write(r.encode())
         print(r.encode())
+        gpio.output(7,False)
+        gpio.output(11,True)
+        gpio.output(13,False)
+        gpio.output(15,True)
+
     for ky in keyPointsY:
         #serialcomm.write(y.encode())
         print(y.encode())
+        gpio.output(7,False)
+        gpio.output(11,False)
+        gpio.output(13,True)
+        gpio.output(15,True)
+    
     cv2.imshow("image", img)
 
-    if cv2.waitKey(100) & 0xFF == 27:  # ESC
+    if cv2.waitKey(1) & 0xFF == 27:  # ESC
+        gpio.output(7,False)
+        gpio.output(11,False)
+        gpio.output(13,False)
+        gpio.output(15,False)
         break
 cam.release()
 cv2.destroyAllWIndows()
