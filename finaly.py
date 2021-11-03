@@ -1,20 +1,17 @@
 import cv2
 import numpy as np
-#import serial
 import camara
-#import time
 import RPi.GPIO as gpio
 
 cap = cv2.VideoCapture(camara.gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
-#serialcomm = serial.Serial('COM7', 9600)
-#serialcomm.timeout = 1
+
 # blue
 lower_colorB = [96, 33, 151]
 upperColorB = [105, 255, 255]
 # red
 lower_colorR = [90, 90, 160]
 upperColorR = [179, 120, 255]
-# amarillo
+# yellow
 lower_colorY = [20, 71, 161]
 upperColorY = [90, 255, 255]
 
@@ -67,7 +64,6 @@ while True:
     cv2.drawKeypoints(img, keyPointsR, img, (0, 255, 0), cv2.DrawMatchesFlags_DRAW_RICH_KEYPOINTS)
     cv2.drawKeypoints(img, keyPointsY, img, (0, 255, 0), cv2.DrawMatchesFlags_DRAW_RICH_KEYPOINTS)
     for kb in keyPointsB:
-        #serialcomm.write(b.encode())
         print(b.encode())
         gpio.output(7,True)
         gpio.output(11,False)
@@ -75,7 +71,6 @@ while True:
         gpio.output(15,False)
 
     for kr in keyPointsR:
-        #serialcomm.write(r.encode())
         print(r.encode())
         gpio.output(7,False)
         gpio.output(11,True)
@@ -83,7 +78,6 @@ while True:
         gpio.output(15,True)
 
     for ky in keyPointsY:
-        #serialcomm.write(y.encode())
         print(y.encode())
         gpio.output(7,False)
         gpio.output(11,False)
